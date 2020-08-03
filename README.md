@@ -1,5 +1,21 @@
 # Maze Generator
 Program that generates a maze given a length and width
 
+## How it works
+* Given a length, width and density of walls, the program will run until it generates a maze with **at least** one 
+possible solution.
+* Contains an implementation of the A* path-finding algorithm to solve generated maze.
+
+### Side notes
+
+> The bigger the area of the maze and density of walls, the longer the program will take to finish because the 
+> availability of free spaces will lower (in other words, there will be no solution more often than not).
+
+> If given density of walls is 100% (or 1.0), the maze will always be impossible because all would-be free spaces will 
+> be walls.
+
+> If the start and end point get generated next to each other, there won't be a path because the solution is trivial 
+> (this could make a 100% density maze possible).
+
 ## Author
 * Duarte Jeremias
