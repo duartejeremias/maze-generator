@@ -8,15 +8,18 @@ class Position:
         self.x = x
         self.y = y
 
+    def __repr__(self):
+        return self.x, self.y
+
     def __str__(self):
         return "(" + str(self.x) + ", " + str(self.y) + ')'
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
 
-    def is_outer_wall(self, length, width):
+    def is_border(self, length, width):
         """
-        returns the bool value depending on if the position is in the outer wall or not
+        returns the bool value depending on if the position is on the border or not
         :param length:
         :param width:
         :return:
@@ -43,33 +46,32 @@ class Maze:
         self.length = length
         self.width = width
 
-        self.outer_walls = []  # array with the positions of every outer wall
+        self.border = []  # array with the positions of border positions
         size = 0
         for y in range(0, width):
             for x in range(0, length):
                 pos = Position(x, y)
-                if pos.is_outer_wall(length, width):
-                    pos.is_wall = True
-                    self.outer_walls.append(pos)
+                if pos.is_border(length, width):
+                    self.border.append(pos)
                     size += 1
 
-        self.inner_walls = []  # array with the positions of every inner wall
+        self.walls = []  # array with the positions of every wall
         self.path = []  # array with the positions of the path taken
 
         # generating a start point
         index = randrange(size)
         # loop while the point generated is in the corner
-        while self.outer_walls[index].is_corner(length, width):
+        while self.border[index].is_corner(length, width):
             index = randrange(size)
-        self.start = self.outer_walls[index]
+        self.start = self.border[index]
 
         # generating an end point
         index = randrange(size)
         # loop while the point generated is in the same wall or collumn as start point or in the corner
-        while self.outer_walls[index].is_corner(length, width) or self.outer_walls[index].x == self.start.x or \
-                self.outer_walls[index].y == self.start.y:
+        while self.border[index].is_corner(length, width) or self.border[index].x == self.start.x or \
+                self.border[index].y == self.start.y:
             index = randrange(size)
-        self.end = self.outer_walls[index]
+        self.end = self.border[index]
 
     def __str__(self):
         result = ""
@@ -80,7 +82,7 @@ class Maze:
                     result += "S"
                 elif pos == self.end:
                     result += "E"
-                elif pos in self.outer_walls or pos in self.inner_walls:
+                elif pos in self.walls:
                     result += "#"
                 else:
                     result += "."
@@ -93,10 +95,34 @@ class Maze:
     def get_end(self):
         return self.end
 
+    def mk_walls(self, density):
+        if not isinstance(density, float) or density < 0 or density > 1.0:
+            raise ValueError("Density must be a float between 0 and 1.0")
+
+        num_walls = int(((self.width * self.length) - 2) * density)  # calculating number of walls
+
+        while num_walls != 0:
+            x = randrange(self.length)
+            y = randrange(self.width)
+            pos = Position(x, y)
+            if (pos in self.walls) or pos == self.start or pos == self.end:
+                continue
+            else:
+                self.walls.append(pos)
+                num_walls -= 1
+
 
 width = 5
 length = 10
-maze = Maze(length, width)
-print(maze.start)
-print(maze.end)
-print(maze)
+density = 0.5
+
+
+def run(width, length, density):
+    maze = Maze(length, width)
+    maze.mk_walls(density)
+    print(maze.start)
+    print(maze.end)
+    print(maze)
+
+
+run(width, length, density)
