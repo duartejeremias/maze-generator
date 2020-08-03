@@ -8,10 +8,11 @@ class Position:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.f = 0
-        self.g = 0
-        self.h = 0
-        self.parent = None
+        # variables for use in path-finding algorithm
+        self.f = 0  # g and h added
+        self.g = 0  # distance to start point
+        self.h = 0  # distance to end point
+        self.parent = None  # parent position
 
     def __repr__(self):
         return self.x, self.y
@@ -21,6 +22,19 @@ class Position:
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y
+
+    def calculte_f(self, start, end):
+        """
+        returns the f cost of the given position
+        :param start (start position):
+        :param end (end position):
+        :return:
+        """
+        if self == start:
+            return 0
+        self.g = sqrt(pow(start.x - self.x, 2) + pow(start.y - self.y, 2))
+        self.h = sqrt(pow(end.x - self.x, 2) + pow(end.y - self.y, 2))
+        self.f = self.g + self.h
 
 
 class Maze:
@@ -88,67 +102,81 @@ class Maze:
                 self.walls.append(pos)
                 num_walls -= 1
 
+    def path_find(self):
+        """
+        method that calculates maze's solution
+        :return: false if no solution, true otherwise
+        """
 
-def calculte_f(pos, start, end):
-    if pos == start:
-        return 0
-    pos.g = sqrt(pow(start.x - pos.x, 2) + pow(start.y - pos.y, 2))
-    pos.h = sqrt(pow(end.x - pos.x, 2) + pow(end.y - pos.y, 2))
-    return pos.g + pos.h
+        # initialize both open and closed lists
+        open_list = [self.start]  # list that contains positions to be processed
+        closed_list = []  # list that contains processed positions
 
+        # main function loop
+        while len(open_list) > 0:
 
-def path_find(maze):
-    open_list = [maze.start]
-    closed_list = []
+            # gets current position (position to process)
+            current_pos = open_list[0]
+            current_index = 0
+            for i, pos in enumerate(open_list):
+                if pos.f < current_pos.f:
+                    current_pos = pos
+                    current_index = i
 
-    while len(open_list) > 0:
-        current_pos = open_list[0]
-        current_index = 0
-        for i, pos in enumerate(open_list):
-            if pos.f < current_pos.f:
-                current_pos = pos
-                current_index = i
+            open_list.pop(current_index)  # removes current position from open list
+            closed_list.append(current_pos)  # inserts current position into closed list (is going to be processed)
 
-        open_list.pop(current_index)
-        closed_list.append(current_pos)
+            # end found
+            if current_pos == self.end:
+                current = current_pos
+                # backtracks to origin
+                while current is not None:
+                    self.path.append(current)
+                    current = current.parent
 
-        if current_pos == maze.end:
-            current = current_pos
-            while current is not None:
-                maze.path.append(current)
-                current = current.parent
-            return True
+                self.path = self.path[::-1]  # reverts path order
+                return True
 
-        children = []
-        for new_pos in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
-            node_pos = Position(current_pos.x + new_pos[0], current_pos.y + new_pos[1])
+            # generate children (positions adjacent to current position)
+            children = []
+            for new_pos in [(0, -1), (0, 1), (-1, 0), (1, 0), (-1, -1), (-1, 1), (1, -1), (1, 1)]:
 
-            if node_pos.x > (maze.length - 1) or node_pos.x < 0 or node_pos.y >(maze.width - 1) or node_pos.y < 0:
-                continue
+                # generate position
+                node_pos = Position(current_pos.x + new_pos[0], current_pos.y + new_pos[1])
 
-            if node_pos in closed_list:
-                continue
-
-            if node_pos in maze.walls:
-                continue
-
-            node_pos.parent = current_pos
-            children.append(node_pos)
-
-        for child in children:
-            for closed_child in closed_list:
-                if child == closed_child:
+                # makes sure new position is inside the maze's boundaries
+                if node_pos.x > (self.length - 1) or node_pos.x < 0 or node_pos.y >(self.width - 1) or node_pos.y < 0:
                     continue
 
-            child.f = calculte_f(child, maze.start, maze.end)
-
-            for open_child in open_list:
-                if child == open_child and child.g > open_child.g:
+                # makes sure new position hasn't been checked to avoid infinite loops
+                if node_pos in closed_list:
                     continue
 
-            open_list.append(child)
-    maze.path.clear()
-    return False
+                # makes sure new position isn't a maze wall
+                if node_pos in self.walls:
+                    continue
+
+                node_pos.parent = current_pos  # update to the position parent
+                children.append(node_pos)  # appends to the available children
+
+            # loop through the children
+            for child in children:
+                # for closed_child in closed_list:
+                    # if child == closed_child:
+                        # continue
+
+                child.calculte_f(self.start, self.end)  # f cost calculation
+
+                # loop to see if child is in open list
+                for open_child in open_list:
+                    if child == open_child and child.g > open_child.g:
+                        continue
+
+                open_list.append(child)  # add child to open list
+
+        self.path.clear()  # if no path calculated, clear the path and return false
+        return False
+
 
 width = 32
 length = 64
@@ -160,7 +188,7 @@ def run(width, length, density):
     maze.mk_walls(density)
     solution = False
     while not solution:
-        solution = path_find(maze)
+        solution = maze.path_find()
     print(maze)
 
 
