@@ -4,6 +4,8 @@ Program that generates a maze given a length and width
 ## How it works
 * Given a length, width and density of walls, the program will run until it generates a maze with **at least** one 
 possible solution.
+* Has 2 types of generation, fast (path is generated first and then the walls) and slow (walls are generated first and 
+  then the path)
 * Contains an implementation of the A* path-finding algorithm to solve generated maze.
 
 ### Side notes
@@ -16,6 +18,9 @@ possible solution.
 
 > If the start and end point get generated next to each other, there won't be a path because the solution is trivial 
 > (this could make a 100% density maze possible).
+
+> It's my first time making a pygame UI to support my project, in other words, UI is a little bit wanky, if you have any
+> suggestions to make it better please send them or do them yourself for me to checkout!
 
 ## Author
 * Duarte Jeremias
