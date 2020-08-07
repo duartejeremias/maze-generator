@@ -94,7 +94,7 @@ class Maze:
             x = randrange(self.length)
             y = randrange(self.width)
             pos = Position(x, y)
-            if (pos in self.walls) or pos == self.start or pos == self.end:
+            if (pos in self.walls) or (pos in self.path) or pos == self.start or pos == self.end:
                 continue
             else:
                 self.walls.append(pos)
@@ -159,9 +159,6 @@ class Maze:
 
             # loop through the children
             for child in children:
-                # for closed_child in closed_list:
-                    # if child == closed_child:
-                        # continue
 
                 child.calculte_f(self.start, self.end)  # f cost calculation
 
