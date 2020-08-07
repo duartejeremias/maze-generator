@@ -26,7 +26,13 @@ def main(width, length, density, method):
 width = int(input("Enter a width (integer): "))
 length = int(input("Enter a length (integer): "))
 density = float(input("Enter a wall density (0-100 percentage): "))
-method = input("Enter 'FAST' for fast generation (first path then walls) or 'SLOW' for slow generation (first walls then path: ")
+method = input("Enter 'FAST' for fast generation (first path then walls) or 'SLOW' for slow generation (first walls "
+               "then path: ")
+if method == 'FAST' and density > 50:
+    print("With the FAST method, having a density bigger than 50% could generate impossible mazes in which the "
+          "required amount of walls to fulfill given density can not be achieved")
+    print("In such cases, the program will enter an infinite loop")
+    method = input("If you wish to proceed type 'FAST' again, 'SLOW' otherwise")
 density = density / 100
 
 
