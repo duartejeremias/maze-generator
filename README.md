@@ -1,3 +1,4 @@
+![Capture](https://user-images.githubusercontent.com/50424889/114473541-58d6ee80-9bec-11eb-95e6-6737de1a1e8c.PNG)
 # Maze Generator
 Program that generates a maze given a length and width
 
