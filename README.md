@@ -17,8 +17,9 @@ python3 main.py
 ## How it works
 * Given a length, width and density of walls, the program will run until it generates a maze with **at least** one
 possible solution.
-* Has 2 types of generation, fast (path is generated first and then the walls) and slow (walls are generated first and
-  then the path)
+* Has 2 types of generation:
+  * FAST (path is generated first and then the walls)
+  * SLOW (walls are generated first and then the path, true random but slow)
 * Contains an implementation of the A* path-finding algorithm to solve generated maze.
 
 ### Side notes
